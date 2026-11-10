@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Budget</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/expensodesignsystem_f3bae1/styles.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#000000}a:hover{color:#1A1A1A}
+input:focus{outline:none;box-shadow:inset 0 0 0 2px #000000}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 1000px; display: flex; flex-direction: column; background: #FFFFFF; color: #000000; font-family: Inter, system-ui, sans-serif; overflow: hidden;">
+  <main style="flex-grow: 1; padding: 52px 20px 20px; display: flex; flex-direction: column; gap: 16px; overflow: hidden;">
+    <header style="display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Budget</h1>
+      <span style="font-size: 14px; color: #545454;">Active for November 2026</span>
+    </header>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label for="b-salary" style="font-size: 14px; font-weight: 500;">Monthly salary</label>
+      <div style="display: flex; align-items: center; height: 52px; padding: 0 16px; background: #F6F6F6;">
+        <span style="font-size: 18px; font-weight: 700; color: #545454; margin-right: 6px;">₹</span>
+        <input id="b-salary" inputmode="numeric" value="1,12,739" style="flex-grow: 1; min-width: 0; border: 0; background: transparent; font: 700 18px Inter, system-ui, sans-serif; color: #000000;">
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column;">
+      <span style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">Budget items</span>
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="7">
+        <div style="display: flex; align-items: center; gap: 8px; min-height: 60px; border-bottom: 1px solid #EEEEEE;">
+          <sc-if value="{{it.pinned}}" hint-placeholder-val="{{false}}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </sc-if>
+          <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 15px; font-weight: 500;">{{it.name}}</span>
+            <span style="font-size: 12px; color: #545454;">{{it.note}}</span>
+          </span>
+          <div style="display: flex; align-items: center; width: 116px; height: 44px; padding: 0 12px; box-sizing: border-box; background: #F6F6F6;">
+            <span style="color: #545454; margin-right: 4px;">₹</span>
+            <input aria-label="{{it.name}} amount" inputmode="numeric" value="{{it.amount}}" style="width: 100%; border: 0; background: transparent; font: 500 15px Inter, system-ui, sans-serif; text-align: right; color: #000000;">
+          </div>
+          <sc-if value="{{it.removable}}" hint-placeholder-val="{{true}}">
+            <button type="button" aria-label="Remove {{it.name}}" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#545454" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+          </sc-if>
+          <sc-if value="{{it.pinned}}" hint-placeholder-val="{{false}}">
+            <span style="width: 44px;"></span>
+          </sc-if>
+        </div>
+      </sc-for>
+      <button type="button" style="align-self: flex-start; margin-top: 12px; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #EEEEEE; color: #000000; font: 500 14px Inter, system-ui, sans-serif; cursor: pointer;">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add item
+      </button>
+    </div>
+
+    <div style="flex-grow: 1;"></div>
+
+    <section aria-label="Summary" style="padding: 16px; border-radius: 16px; background: #F6F6F6; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Budgeted</span>
+        <span style="font-size: 15px; font-weight: 700;">₹57,108</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Salary</span>
+        <span style="font-size: 15px; font-weight: 700;">₹1,12,739</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Planned savings</span>
+        <span style="font-size: 15px; font-weight: 700; color: #276B45;">+₹55,631</span>
+      </div>
+    </section>
+    <button type="button" onClick="{{openSheet}}" style="height: 56px; border: 0; border-radius: 999px; background: #000000; color: #FFFFFF; font: 500 16px Inter, system-ui, sans-serif; cursor: pointer;">Save budget</button>
+  </main>
+
+  <nav aria-label="Main" style="flex-shrink: 0; display: flex; justify-content: space-around; height: 80px; padding-bottom: 14px; box-sizing: border-box; border-top: 1px solid #E2E2E2; background: #FFFFFF;">
+    <a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="Calendar.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</a>
+    <a href="Stats.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Stats</a>
+    <a href="Budget.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #000000; font-size: 11px; font-weight: 700;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-4"/><path d="M3 5a2 2 0 0 0 2 2h15a1 1 0 0 1 1 1v4h-4a2 2 0 0 0 0 4h4"/></svg>Budget</a>
+    <a href="Settings.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</a>
+  </nav>
+
+  <sc-if value="{{sheet}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: flex-end;">
+      <div role="dialog" aria-label="Apply budget change" style="padding: 24px 20px 32px; border-radius: 16px 16px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 20px; font-weight: 700;">Apply from this month or next month?</h2>
+        <p style="margin: 0 0 4px; font-size: 14px; line-height: 20px; color: #545454;">Past months keep the budget they had, so their colours and stats never change.</p>
+        <button type="button" onClick="{{applyThis}}" style="height: 52px; border: 0; border-radius: 999px; background: #000000; color: #FFFFFF; font: 500 16px Inter, system-ui, sans-serif; cursor: pointer;">This month · November</button>
+        <button type="button" onClick="{{applyNext}}" style="height: 52px; border: 0; border-radius: 999px; background: #EEEEEE; color: #000000; font: 500 16px Inter, system-ui, sans-serif; cursor: pointer;">Next month · December</button>
+        <button type="button" onClick="{{closeSheet}}" style="height: 44px; border: 0; background: transparent; color: #000000; font: 500 15px Inter, system-ui, sans-serif; text-decoration: underline; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+    <div role="status" style="position: absolute; left: 20px; right: 20px; bottom: 100px; height: 48px; padding: 0 16px; border-radius: 999px; background: #000000; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.16);">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+      {{toast}}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sheet: false, toast: '' };
+  }
+  renderVals() {
+    var self = this;
+    var items = [
+      { name: 'Daily expenses', amount: '10,000', note: 'Always included · ₹333.33 a day', pinned: true, removable: false },
+      { name: 'Rent', amount: '16,000', note: 'Monthly', pinned: false, removable: true },
+      { name: 'Money home', amount: '15,000', note: 'Monthly', pinned: false, removable: true },
+      { name: 'EMI', amount: '8,108', note: 'Monthly', pinned: false, removable: true },
+      { name: 'Shopping', amount: '4,000', note: 'Monthly', pinned: false, removable: true },
+      { name: 'Bills', amount: '2,500', note: 'Monthly', pinned: false, removable: true },
+      { name: 'Gym', amount: '1,500', note: 'Monthly', pinned: false, removable: true }
+    ];
+    return {
+      items: items,
+      sheet: this.state.sheet,
+      hasToast: !!this.state.toast,
+      toast: this.state.toast,
+      openSheet: function () { self.setState({ sheet: true, toast: '' }); },
+      closeSheet: function () { self.setState({ sheet: false }); },
+      applyThis: function () { self.setState({ sheet: false, toast: 'Saved · applies from November' }); },
+      applyNext: function () { self.setState({ sheet: false, toast: 'Saved · applies from December' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

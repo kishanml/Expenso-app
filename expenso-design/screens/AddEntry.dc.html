@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add entry</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/expensodesignsystem_f3bae1/styles.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#000000}a:hover{color:#1A1A1A}
+input:focus{outline:none;box-shadow:inset 0 0 0 2px #000000}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 48px 20px 24px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF; color: #000000; font-family: Inter, system-ui, sans-serif;">
+  <header style="display: flex; align-items: center; justify-content: space-between;">
+    <a href="Home.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; background: #F6F6F6; display: flex; align-items: center; justify-content: center;">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 17px; font-weight: 700;">Add entry</h1>
+    <span style="width: 44px;"></span>
+  </header>
+
+  <div aria-live="polite" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;">
+    <span style="font-size: 48px; line-height: 56px; font-weight: 700; color: {{amountColor}};">{{sign}}₹{{display}}</span>
+    <span style="font-size: 13px; color: #545454;">{{hint}}</span>
+  </div>
+
+  <div role="group" aria-label="Type" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 36px; background: #EEEEEE;">
+    <button type="button" onClick="{{setDebit}}" aria-pressed="{{isDebit}}" style="height: 40px; border: 0; border-radius: 999px; font: 500 15px Inter, system-ui, sans-serif; cursor: pointer; background: {{debitBg}}; color: {{debitFg}};">− Debit</button>
+    <button type="button" onClick="{{setCredit}}" aria-pressed="{{isCredit}}" style="height: 40px; border: 0; border-radius: 999px; font: 500 15px Inter, system-ui, sans-serif; cursor: pointer; background: {{creditBg}}; color: {{creditFg}};">+ Credit</button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span style="font-size: 13px; font-weight: 500; color: #545454;">Category</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="height: 36px; padding: 0 14px; border: 0; border-radius: 999px; font: 500 14px Inter, system-ui, sans-serif; cursor: pointer; background: {{c.bg}}; color: {{c.fg}};">{{c.name}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+    <button type="button" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; background: #F6F6F6; font: 500 14px Inter, system-ui, sans-serif; color: #000000; cursor: pointer;">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+      Today, 10 Nov
+    </button>
+    <label style="display: flex; align-items: center; height: 44px; background: #F6F6F6;">
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Note</span>
+      <input placeholder="Note (optional)" style="width: 100%; height: 100%; box-sizing: border-box; padding: 0 14px; border: 0; background: transparent; font: 400 14px Inter, system-ui, sans-serif; color: #000000;">
+    </label>
+  </div>
+
+  <div style="flex-grow: 1;"></div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+    <sc-for list="{{keys}}" as="k" hint-placeholder-count="12">
+      <button type="button" onClick="{{k.press}}" aria-label="{{k.label}}" style="height: 52px; border: 0; border-radius: 16px; background: #F6F6F6; font: 500 22px Inter, system-ui, sans-serif; color: #000000; cursor: pointer;">{{k.text}}</button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{valid}}" hint-placeholder-val="{{true}}">
+    <a href="Home.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 999px; background: #000000; color: #FFFFFF; font-size: 16px; font-weight: 500; text-decoration: none;">Save entry</a>
+  </sc-if>
+  <sc-if value="{{invalid}}" hint-placeholder-val="{{false}}">
+    <button type="button" disabled style="height: 56px; border: 0; border-radius: 999px; background: #EEEEEE; color: #757575; font: 500 16px Inter, system-ui, sans-serif;">Save entry</button>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { amount: '250', type: 'debit', cat: 'Daily expenses' };
+  }
+  group(s) {
+    var parts = s.split('.');
+    var n = parts[0] || '0';
+    var last = n.slice(-3), rest = n.slice(0, -3);
+    if (rest) last = ',' + last;
+    var out = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + last;
+    return parts.length > 1 ? out + '.' + parts[1] : out;
+  }
+  press(k) {
+    var a = this.state.amount;
+    if (k === 'del') a = a.slice(0, -1);
+    else if (k === '.') { if (a.indexOf('.') < 0) a = (a || '0') + '.'; }
+    else {
+      var dot = a.indexOf('.');
+      if (dot >= 0 && a.length - dot > 2) return;
+      if (a.replace('.', '').length >= 9) return;
+      a = a === '0' ? k : a + k;
+    }
+    this.setState({ amount: a });
+  }
+  renderVals() {
+    var s = this.state;
+    var debit = s.type === 'debit';
+    var num = parseFloat(s.amount || '0');
+    var valid = num > 0;
+    var names = ['Daily expenses', 'Bills', 'Shopping', 'Gym', 'Rent', 'EMI', 'Money home'];
+    var self = this;
+    var cats = names.map(function (n) {
+      var on = n === s.cat;
+      return { name: n, on: on, bg: on ? '#000000' : '#EEEEEE', fg: on ? '#FFFFFF' : '#000000', pick: function () { self.setState({ cat: n }); } };
+    });
+    var labels = ['1','2','3','4','5','6','7','8','9','.','0','del'];
+    var keys = labels.map(function (k) {
+      return { text: k === 'del' ? '⌫' : k, label: k === 'del' ? 'Delete' : (k === '.' ? 'Decimal point' : k), press: function () { self.press(k); } };
+    });
+    var hint = !valid ? 'Enter an amount' : (num > 1000000 ? 'Over ₹10 lakh — we’ll ask you to confirm' : s.cat + ' · ' + (debit ? 'money out' : 'money in'));
+    return {
+      display: this.group(s.amount || '0'),
+      sign: debit ? '−' : '+',
+      amountColor: valid ? (debit ? '#000000' : '#276B45') : '#AFAFAF',
+      hint: hint,
+      isDebit: debit ? 'true' : 'false',
+      isCredit: debit ? 'false' : 'true',
+      debitBg: debit ? '#FFFFFF' : 'transparent',
+      debitFg: debit ? '#000000' : '#545454',
+      creditBg: debit ? 'transparent' : '#FFFFFF',
+      creditFg: debit ? '#545454' : '#000000',
+      setDebit: function () { self.setState({ type: 'debit' }); },
+      setCredit: function () { self.setState({ type: 'credit' }); },
+      cats: cats,
+      keys: keys,
+      valid: valid,
+      invalid: !valid
+    };
+  }
+}
+</script>
+</body>
+</html>

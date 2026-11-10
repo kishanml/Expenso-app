@@ -1,0 +1,48 @@
+name: expenso
+description: "Know every day if you're on track. Offline expense tracking."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Offline store. hive_ce is the maintained community fork of hive.
+  hive_ce: ^2.11.0
+  hive_ce_flutter: ^2.3.0
+
+  # ChangeNotifier wiring.
+  provider: ^6.1.2
+
+  # Weekday and month names only.
+  intl: ^0.20.2
+
+  # Settings: export writes a backup file, import reads one back.
+  file_selector: ^1.0.3
+  share_plus: ^12.0.0
+  path_provider: ^2.1.5
+
+  # Settings: the app-lock switch.
+  local_auth: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

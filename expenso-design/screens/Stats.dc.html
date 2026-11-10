@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Statistics</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/expensodesignsystem_f3bae1/styles.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#000000}a:hover{color:#1A1A1A}
+</style>
+</helmet>
+<div style="width: 390px; height: 1240px; display: flex; flex-direction: column; background: #FFFFFF; color: #000000; font-family: Inter, system-ui, sans-serif; overflow: hidden;">
+  <main style="flex-grow: 1; padding: 52px 20px 20px; display: flex; flex-direction: column; gap: 16px; overflow: hidden;">
+    <header style="display: flex; align-items: center; justify-content: space-between;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Stats</h1>
+      <button type="button" style="display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #EEEEEE; font: 500 14px Inter, system-ui, sans-serif; color: #000000; cursor: pointer;">
+        November 2026
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </header>
+
+    <section aria-label="Saved this month" style="padding: 20px; border-radius: 16px; background: linear-gradient(135deg, #000000, #282828); color: #FFFFFF; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 14px; color: #AFAFAF;">Saved this month</span>
+      <span style="font-size: 40px; line-height: 46px; font-weight: 700;">+₹66,294</span>
+      <span style="font-size: 14px; color: #AFAFAF;">58.8% of salary · so far, 10 of 30 days</span>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+      <div style="padding: 14px; border-radius: 16px; background: #F6F6F6; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Credit · in</span>
+        <span style="font-size: 18px; font-weight: 700; color: #276B45;">+₹120</span>
+      </div>
+      <div style="padding: 14px; border-radius: 16px; background: #F6F6F6; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Debit · out</span>
+        <span style="font-size: 18px; font-weight: 700;">−₹46,445</span>
+      </div>
+      <div style="padding: 14px; border-radius: 16px; background: #F6F6F6; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 12px; color: #545454;">Salary used</span>
+        <span style="font-size: 18px; font-weight: 700;">41.2%</span>
+        <div style="height: 6px; border-radius: 999px; background: #E2E2E2; overflow: hidden;"><div style="width: 41.2%; height: 100%; background: #000000;"></div></div>
+      </div>
+      <div style="padding: 14px; border-radius: 16px; background: #F6F6F6; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 12px; color: #545454;">Daily expenses saved</span>
+        <span style="font-size: 18px; font-weight: 700; color: #276B45;">+₹635</span>
+        <span style="font-size: 12px; color: #545454;">₹3,333 allowed − ₹2,698</span>
+      </div>
+    </div>
+
+    <section aria-label="Spending by category" style="display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 4px 0 0; font-size: 17px; font-weight: 700;">Spending by category</h2>
+      <div role="img" aria-label="Share of spending by category" style="display: flex; height: 16px; border-radius: 999px; overflow: hidden; gap: 2px;">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="7">
+          <div style="width: {{c.share}}; background: {{c.swatch}};"></div>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="7">
+          <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid #EEEEEE;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+              <span style="width: 10px; height: 10px; border-radius: 999px; background: {{c.swatch}}; flex-shrink: 0;"></span>
+              <span style="flex-grow: 1; font-weight: 500;">{{c.name}}</span>
+              <span><strong style="font-weight: 700;">{{c.actual}}</strong> <span style="color: #545454;">/ {{c.budget}}</span></span>
+            </div>
+            <div style="height: 4px; border-radius: 999px; background: #EEEEEE; overflow: hidden;">
+              <div style="width: {{c.pct}}; height: 100%; background: {{c.bar}};"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="Daily expenses trend" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h2 style="margin: 4px 0 0; font-size: 17px; font-weight: 700;">Daily expenses trend</h2>
+        <span style="font-size: 12px; color: #545454;">- - limit ₹333.33</span>
+      </div>
+      <div role="img" aria-label="Daily expenses per day, 1 to 10 November, 3 days over the limit" style="position: relative; height: 140px; display: flex; align-items: flex-end; gap: 6px; padding: 0 2px; border-bottom: 1px solid #E2E2E2;">
+        <div style="position: absolute; left: 0; right: 0; bottom: 67px; border-top: 1.5px dashed #545454;"></div>
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="10">
+          <div style="flex: 1 1 0; height: {{b.h}}; background: {{b.color}}; border-radius: 4px 4px 0 0;"></div>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px; padding: 0 2px;">
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="10">
+          <span style="flex: 1 1 0; text-align: center; font-size: 11px; color: {{b.labelColor}};">{{b.d}}</span>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+
+  <nav aria-label="Main" style="flex-shrink: 0; display: flex; justify-content: space-around; height: 80px; padding-bottom: 14px; box-sizing: border-box; border-top: 1px solid #E2E2E2; background: #FFFFFF;">
+    <a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="Calendar.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</a>
+    <a href="Stats.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #000000; font-size: 11px; font-weight: 700;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Stats</a>
+    <a href="Budget.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-4"/><path d="M3 5a2 2 0 0 0 2 2h15a1 1 0 0 1 1 1v4h-4a2 2 0 0 0 0 4h4"/></svg>Budget</a>
+    <a href="Settings.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; padding-top: 10px; text-decoration: none; color: #757575; font-size: 11px; font-weight: 500;">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+  inr(n) {
+    var s = Math.round(n).toString();
+    var last = s.slice(-3), rest = s.slice(0, -3);
+    if (rest) last = ',' + last;
+    return '₹' + rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + last;
+  }
+  renderVals() {
+    var self = this;
+    var raw = [
+      ['Rent', 16000, 16000], ['Money home', 15000, 15000], ['EMI', 8108, 8108],
+      ['Daily expenses', 2698, 10000], ['Shopping', 1899, 4000], ['Gym', 1500, 1500], ['Bills', 1240, 2500]
+    ];
+    var swatches = ['#000000', '#333333', '#545454', '#757575', '#949494', '#AFAFAF', '#CFCFCF'];
+    var total = raw.reduce(function (a, r) { return a + r[1]; }, 0);
+    var cats = raw.map(function (r, i) {
+      var over = r[1] > r[2];
+      return {
+        name: r[0], actual: self.inr(r[1]), budget: self.inr(r[2]),
+        share: (r[1] / total * 100).toFixed(1) + '%',
+        pct: Math.min(100, r[1] / r[2] * 100).toFixed(0) + '%',
+        bar: over ? '#C62828' : '#000000',
+        swatch: swatches[i]
+      };
+    });
+    var LIMIT = 10000 / 30;
+    var spend = [280, 410, 150, 333, 520, 90, 300, 0, 365, 250];
+    var bars = spend.map(function (v, i) {
+      var over = v > LIMIT;
+      return { d: i + 1, h: Math.max(2, Math.round(v / 700 * 140)) + 'px', color: v === 0 ? '#E2E2E2' : (over ? '#C62828' : '#000000'), labelColor: over ? '#C62828' : '#545454' };
+    });
+    return { cats: cats, bars: bars };
+  }
+}
+</script>
+</body>
+</html>
