@@ -24,6 +24,8 @@ class HomeScreen extends StatelessWidget {
     required this.today,
     required this.onOpenCalendar,
     required this.onOpenEntry,
+    this.pendingSuggestions = 0,
+    this.onReview,
   });
 
   final MonthSummary summary;
@@ -31,6 +33,10 @@ class HomeScreen extends StatelessWidget {
   final DateTime today;
   final VoidCallback onOpenCalendar;
   final ValueChanged<Entry> onOpenEntry;
+
+  /// Transactions read from bank messages that are waiting to be confirmed.
+  final int pendingSuggestions;
+  final VoidCallback? onReview;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +57,10 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         _ThisMonthCard(summary: summary),
         const SizedBox(height: AppSpacing.lg),
+        if (pendingSuggestions > 0 && onReview != null) ...[
+          _ReviewBanner(count: pendingSuggestions, onTap: onReview!),
+          const SizedBox(height: AppSpacing.lg),
+        ],
         if (entries.isEmpty)
           _EmptyEntries(s: s)
         else
@@ -396,6 +406,63 @@ class _EntryRow extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Offers the transactions read out of bank messages. Sits under the month
+/// card rather than above the hero, so what is already true outranks what the
+/// app merely suspects.
+class _ReviewBanner extends StatelessWidget {
+  const _ReviewBanner({required this.count, required this.onTap});
+
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppSurfaces.of(context);
+
+    return Semantics(
+      button: true,
+      label: '$count transactions from your messages, waiting to be confirmed',
+      excludeSemantics: true,
+      child: Material(
+        color: s.softer,
+        borderRadius: AppRadius.card,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              children: [
+                AppIcon(AppIcons.chat, size: 20, color: s.ink),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$count from your messages',
+                        style: AppText.row,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Tap to review before adding',
+                        style: AppText.meta.copyWith(
+                          color: s.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AppIcon(AppIcons.chevronRight, size: 20, color: s.ink),
+              ],
+            ),
+          ),
         ),
       ),
     );

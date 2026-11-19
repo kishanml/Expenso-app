@@ -72,6 +72,12 @@ abstract final class AppIcons {
       IconSpec(paths: ['M12 3v12M7 10l5 5 5-5M5 21h14']);
   static const import =
       IconSpec(paths: ['M12 15V3M7 8l5-5 5 5M5 21h14']);
+  /// Not in the mockups — Settings needs it for the bank-messages row. Drawn
+  /// in the same language as the rest: 24 viewBox, 2px stroke, round caps.
+  static const chat = IconSpec(paths: [
+    'M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z',
+  ]);
+
   /// Not in the mockups — Add entry needs it in edit mode. Drawn in the same
   /// lucide-style language as the rest: 24 viewBox, 2px stroke, round caps.
   static const trash = IconSpec(paths: [

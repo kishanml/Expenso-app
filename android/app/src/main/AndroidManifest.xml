@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Reading bank SMS to offer draft entries (Settings > Automatic
+         entries). Asked for at runtime, only when the person turns it on. -->
+    <uses-permission android:name="android.permission.READ_SMS"/>
+
     <!-- App lock (Settings > Security). -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 

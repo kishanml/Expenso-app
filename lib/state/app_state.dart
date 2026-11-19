@@ -6,7 +6,9 @@ import '../data/models/month_budget.dart';
 import '../data/repositories/budget_repository.dart';
 import '../data/repositories/entry_repository.dart';
 import '../data/repositories/settings_repository.dart';
+import '../data/services/sms_inbox_service.dart';
 import '../domain/backup.dart';
+import '../domain/sms/entry_suggestion.dart';
 import '../domain/month_summary.dart';
 
 /// The app's single source of truth. Composes the three repositories and
@@ -17,13 +19,16 @@ class AppState extends ChangeNotifier {
     SettingsRepository? settings,
     BudgetRepository? budgets,
     EntryRepository? entries,
+    SmsInboxService? sms,
   })  : _settings = settings ?? SettingsRepository(),
         _budgets = budgets ?? BudgetRepository(),
-        _entries = entries ?? EntryRepository();
+        _entries = entries ?? EntryRepository(),
+        _sms = sms ?? const SmsInboxService();
 
   final SettingsRepository _settings;
   final BudgetRepository _budgets;
   final EntryRepository _entries;
+  final SmsInboxService _sms;
 
   /// Overridable so tests and the mockup-parity checks can pin a date.
   DateTime Function() clock = DateTime.now;
@@ -43,6 +48,78 @@ class AppState extends ChangeNotifier {
 
   Future<void> setAppLock(bool value) async {
     await _settings.setAppLock(value);
+    notifyListeners();
+  }
+
+  // ── Reading bank SMS ────────────────────────────────────────────────────
+
+  bool get smsEnabled => _settings.smsEnabled;
+
+  /// Suggestions waiting to be confirmed. Held in memory only: they are a view
+  /// of the inbox, not data of our own.
+  List<EntrySuggestion> get suggestions => List.unmodifiable(_suggestions);
+  var _suggestions = <EntrySuggestion>[];
+
+  Future<void> setSmsEnabled(bool value) async {
+    await _settings.setSmsEnabled(value);
+    if (!value) _suggestions = [];
+    notifyListeners();
+  }
+
+  /// Reads new messages and works out which look like transactions.
+  ///
+  /// Looks back 30 days on the first scan so there is something to review
+  /// straight away, and only since the last scan after that.
+  Future<void> scanMessages({int firstScanDays = 30}) async {
+    if (!smsEnabled) return;
+
+    final last = _settings.lastSmsScan;
+    final since = last.millisecondsSinceEpoch == 0
+        ? today.subtract(Duration(days: firstScanDays))
+        : last;
+
+    final messages = await _sms.readInbox(since: since);
+
+    _suggestions = SuggestionBuilder.build(
+      messages: [
+        for (final message in messages)
+          (
+            id: message.id,
+            body: message.body,
+            receivedAt: message.receivedAt,
+            sender: message.sender,
+          ),
+      ],
+      handledIds: _settings.handledSmsIds,
+      categories: categories,
+    );
+
+    await _settings.setLastSmsScan(clock());
+    notifyListeners();
+  }
+
+  /// Confirms a suggestion: writes the entry and never offers it again.
+  Future<void> acceptSuggestion(
+    EntrySuggestion suggestion, {
+    String? category,
+    String? note,
+  }) async {
+    await _entries.save(
+      suggestion.toEntry(categoryOverride: category, noteOverride: note),
+    );
+    await _forget(suggestion);
+  }
+
+  /// Dismisses a suggestion without writing anything.
+  Future<void> skipSuggestion(EntrySuggestion suggestion) =>
+      _forget(suggestion);
+
+  Future<void> _forget(EntrySuggestion suggestion) async {
+    await _settings.markSmsHandled([suggestion.messageId]);
+    _suggestions = [
+      for (final other in _suggestions)
+        if (other.messageId != suggestion.messageId) other,
+    ];
     notifyListeners();
   }
 

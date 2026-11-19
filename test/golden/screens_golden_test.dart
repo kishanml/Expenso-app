@@ -10,6 +10,8 @@ import 'package:expenso/ui/screens/add_entry/add_entry_screen.dart';
 import 'package:expenso/ui/screens/budget/budget_screen.dart';
 import 'package:expenso/ui/screens/calendar/calendar_screen.dart';
 import 'package:expenso/ui/screens/lock/lock_screen.dart';
+import 'package:expenso/ui/screens/review/review_screen.dart';
+import 'package:expenso/domain/sms/entry_suggestion.dart';
 import 'package:expenso/ui/screens/settings/settings_screen.dart';
 import 'package:expenso/ui/screens/shell/app_shell.dart';
 import 'package:expenso/ui/screens/stats/stats_screen.dart';
@@ -243,6 +245,11 @@ void main() {
             themeMode: ThemeMode.light,
             appLock: true,
             appLockAvailable: true,
+            smsEnabled: true,
+            smsSupported: true,
+            pendingCount: 2,
+            onToggleSms: (_) {},
+            onReview: () {},
             busy: false,
             onExport: () {},
             onImport: () {},
@@ -252,6 +259,47 @@ void main() {
         ),
       ),
       'settings',
+    );
+  });
+
+  testWidgets('review', (tester) async {
+    final suggestions = SuggestionBuilder.build(
+      messages: [
+        (
+          id: '1',
+          body: 'Rs.250.00 debited from A/c XX1234 on 18-11-26 to VPA '
+              'swiggy@okhdfcbank. Ref 123456789. -HDFC Bank',
+          receivedAt: DateTime(2026, 11, 18, 13),
+          sender: 'HDFCBK',
+        ),
+        (
+          id: '2',
+          body: 'Rs 1899 spent on your HDFC Bank Credit Card xx1234 at '
+              'NIKE STORE on 17-11-26',
+          receivedAt: DateTime(2026, 11, 17, 19),
+          sender: 'HDFCBK',
+        ),
+        (
+          id: '3',
+          body: 'Rs 120 credited via UPI ref 88123 from refund@ybl',
+          receivedAt: DateTime(2026, 11, 16, 9),
+          sender: 'UPIMSG',
+        ),
+      ],
+      handledIds: const {},
+      categories: _categories,
+    );
+
+    await shoot(
+      tester,
+      ReviewScreen(
+        suggestions: suggestions,
+        categories: _categories,
+        onAccept: (_, _) {},
+        onSkip: (_) {},
+      ),
+      'review',
+      height: 1100,
     );
   });
 

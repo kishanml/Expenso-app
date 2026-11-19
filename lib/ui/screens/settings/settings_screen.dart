@@ -15,6 +15,11 @@ class SettingsScreen extends StatelessWidget {
     required this.themeMode,
     required this.appLock,
     required this.appLockAvailable,
+    required this.smsEnabled,
+    required this.smsSupported,
+    required this.pendingCount,
+    required this.onToggleSms,
+    required this.onReview,
     required this.busy,
     required this.onExport,
     required this.onImport,
@@ -28,6 +33,18 @@ class SettingsScreen extends StatelessWidget {
   /// False where the device has no biometrics or PIN — desktop, or a phone
   /// with no screen lock set.
   final bool appLockAvailable;
+
+  /// Reading bank messages is on.
+  final bool smsEnabled;
+
+  /// False on iOS and desktop, where apps cannot read messages at all.
+  final bool smsSupported;
+
+  /// How many read transactions are waiting to be confirmed.
+  final int pendingCount;
+
+  final ValueChanged<bool> onToggleSms;
+  final VoidCallback onReview;
 
   /// An export or import is in flight; the rows are inert until it finishes.
   final bool busy;
@@ -94,6 +111,44 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xxl),
+
+                if (smsSupported) ...[
+                  _SectionLabel('Automatic entries'),
+                  const SizedBox(height: AppSpacing.sm),
+                  _Group(
+                    children: [
+                      _SwitchRow(
+                        icon: AppIcons.chat,
+                        title: 'Read bank messages',
+                        subtitle: smsEnabled
+                            ? 'Expenso suggests entries you confirm'
+                            : 'Off \u2014 nothing is read',
+                        value: smsEnabled,
+                        onChanged: onToggleSms,
+                      ),
+                      if (smsEnabled)
+                        _ActionRow(
+                          icon: AppIcons.check,
+                          title: 'Review suggestions',
+                          subtitle: pendingCount == 0
+                              ? 'Nothing waiting'
+                              : '$pendingCount waiting to be confirmed',
+                          onTap: onReview,
+                          topDivider: true,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Messages are read on this phone and never sent anywhere. '
+                    'Nothing is added to your entries until you confirm it.',
+                    style: AppText.caption.copyWith(
+                      color: s.textSecondary,
+                      height: 18 / 12,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                ],
 
                 _SectionLabel('Security'),
                 const SizedBox(height: AppSpacing.sm),
@@ -188,6 +243,7 @@ class _ActionRow extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.divider = false,
+    this.topDivider = false,
   });
 
   final IconSpec icon;
@@ -195,6 +251,7 @@ class _ActionRow extends StatelessWidget {
   final String subtitle;
   final VoidCallback? onTap;
   final bool divider;
+  final bool topDivider;
 
   @override
   Widget build(BuildContext context) {
@@ -211,9 +268,16 @@ class _ActionRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: 64),
-          decoration: divider
+          decoration: (divider || topDivider)
               ? BoxDecoration(
-                  border: Border(bottom: BorderSide(color: s.border)),
+                  border: Border(
+                    top: topDivider
+                        ? BorderSide(color: s.border)
+                        : BorderSide.none,
+                    bottom: divider
+                        ? BorderSide(color: s.border)
+                        : BorderSide.none,
+                  ),
                 )
               : null,
           child: Row(
@@ -237,6 +301,58 @@ class _ActionRow extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A row with a title, a subtitle and the pill switch.
+class _SwitchRow extends StatelessWidget {
+  const _SwitchRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconSpec icon;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppSurfaces.of(context);
+    final tint = s.ink;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 64),
+      child: Row(
+        children: [
+          AppIcon(icon, size: 20, color: tint),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(title, style: AppText.row.copyWith(color: tint)),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: AppText.meta.copyWith(color: s.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          _Switch(
+            value: value,
+            onChanged: onChanged,
+            semanticLabel: title,
+          ),
+        ],
       ),
     );
   }
@@ -292,6 +408,7 @@ class _LockRow extends StatelessWidget {
           _Switch(
             value: enabled && available,
             onChanged: available ? onChanged : null,
+            semanticLabel: 'App lock',
           ),
         ],
       ),
@@ -302,10 +419,15 @@ class _LockRow extends StatelessWidget {
 /// The 52×32 pill switch from the mockup: ink track when on, #AFAFAF when
 /// off, 26px white knob with a soft shadow.
 class _Switch extends StatelessWidget {
-  const _Switch({required this.value, required this.onChanged});
+  const _Switch({
+    required this.value,
+    required this.onChanged,
+    required this.semanticLabel,
+  });
 
   final bool value;
   final ValueChanged<bool>? onChanged;
+  final String semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -315,7 +437,7 @@ class _Switch extends StatelessWidget {
     return Semantics(
       toggled: value,
       enabled: !disabled,
-      label: 'App lock',
+      label: semanticLabel,
       child: GestureDetector(
         onTap: disabled ? null : () => onChanged!(!value),
         behavior: HitTestBehavior.opaque,

@@ -11,6 +11,7 @@ import '../../../data/models/entry.dart';
 import '../../../data/models/month_budget.dart';
 import '../../../data/services/app_lock_service.dart';
 import '../../../data/services/backup_service.dart';
+import '../../../data/services/sms_inbox_service.dart';
 import '../../../domain/backup.dart';
 import '../../../state/app_state.dart';
 import '../../widgets/app_icons.dart';
@@ -20,6 +21,7 @@ import '../add_entry/add_entry_screen.dart';
 import '../budget/budget_screen.dart';
 import '../calendar/calendar_screen.dart';
 import '../home/home_screen.dart';
+import '../review/review_screen.dart';
 import '../settings/settings_screen.dart';
 import '../stats/stats_screen.dart';
 
@@ -49,15 +51,26 @@ class _AppShellState extends State<AppShell> {
 
   final _backups = const BackupService();
   final _lock = AppLockService();
+  final _sms = const SmsInboxService();
 
   bool _appLockAvailable = false;
+  bool _smsSupported = false;
   bool _busy = false;
 
   @override
   void initState() {
     super.initState();
+
     _lock.isAvailable().then((available) {
       if (mounted) setState(() => _appLockAvailable = available);
+    });
+
+    _sms.isSupported().then((supported) {
+      if (!mounted) return;
+      setState(() => _smsSupported = supported);
+      // A scan on open is what makes the feature feel automatic without ever
+      // writing anything on its own.
+      if (supported) context.read<AppState>().scanMessages();
     });
   }
 
@@ -82,6 +95,8 @@ class _AppShellState extends State<AppShell> {
                   today: state.today,
                   onOpenCalendar: () => _select(NavTab.calendar),
                   onOpenEntry: _openEntry,
+                  pendingSuggestions: state.suggestions.length,
+                  onReview: _openReview,
                 ),
                 CalendarScreen(
                   summary: state.summaryFor(month),
@@ -107,6 +122,11 @@ class _AppShellState extends State<AppShell> {
                   themeMode: state.themeMode,
                   appLock: state.appLock,
                   appLockAvailable: _appLockAvailable,
+                  smsEnabled: state.smsEnabled,
+                  smsSupported: _smsSupported,
+                  pendingCount: state.suggestions.length,
+                  onToggleSms: _toggleSms,
+                  onReview: _openReview,
                   busy: _busy,
                   onExport: _export,
                   onImport: _import,
@@ -169,6 +189,62 @@ class _AppShellState extends State<AppShell> {
     showAppToast(
       context,
       'Saved \u00B7 applies from ${Dates.monthName(effective)}',
+    );
+  }
+
+  /// Turning the feature on asks for the SMS permission first, then scans.
+  Future<void> _toggleSms(bool value) async {
+    final state = context.read<AppState>();
+
+    if (!value) {
+      await state.setSmsEnabled(false);
+      if (mounted) showAppToast(context, 'Bank messages off');
+      return;
+    }
+
+    final granted = await _sms.hasPermission()
+        ? true
+        : await _sms.requestPermission();
+
+    if (!mounted) return;
+    if (!granted) {
+      showAppToast(
+        context,
+        'Expenso needs permission to read messages',
+        isError: true,
+      );
+      return;
+    }
+
+    await state.setSmsEnabled(true);
+    await state.scanMessages();
+    if (!mounted) return;
+
+    final found = state.suggestions.length;
+    showAppToast(
+      context,
+      found == 0
+          ? 'No transactions found yet'
+          : 'Found $found to review',
+    );
+  }
+
+  Future<void> _openReview() async {
+    final state = context.read<AppState>();
+
+    await Navigator.of(context).push<void>(
+      _slideUpRoute(
+        AnimatedBuilder(
+          animation: state,
+          builder: (context, _) => ReviewScreen(
+            suggestions: state.suggestions,
+            categories: state.categories,
+            onAccept: (suggestion, category) =>
+                state.acceptSuggestion(suggestion, category: category),
+            onSkip: state.skipSuggestion,
+          ),
+        ),
+      ),
     );
   }
 
